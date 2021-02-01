@@ -4,11 +4,15 @@ from time import *
 class MyFrame(Frame):
   def __init__(self):
     self._msg = -1
+    self._history_o = []
+    self._history_x = []
+    self._turn = 0
     Frame.__init__(self)
     def onObjectClick(event):                  
       print('Got object click', event.x, event.y)
       print(event.widget.find_closest(event.x, event.y))
       self._msg = int(''.join(map(str, event.widget.find_closest(event.x, event.y)))) - 6
+      self._history_o.append(self._msg)
       print(self._msg)
       print(type(self._msg))
 
@@ -54,11 +58,7 @@ class MyFrame(Frame):
     click_8 = [140, 180, 160, 200]
     click_9 = [180, 180, 200, 200]
 
-    My_circle = self.myCanvas.create_oval(0, 0, 0, 0, width = 10)
     click_container = [click_1, click_2, click_3, click_4, click_5, click_6, click_7, click_8, click_9]
-    My_iris_1 = self.myCanvas.create_oval(135, 135, 145, 145, fill = "blue")
-    My_iris_2 = self.myCanvas.create_oval(195, 135, 205, 145, fill = "blue")
-
     self.myCanvas.tag_bind(upper_square_1, '<ButtonPress-1>', onObjectClick)
     self.myCanvas.tag_bind(upper_square_2, '<ButtonPress-1>', onObjectClick)
     self.myCanvas.tag_bind(upper_square_3, '<ButtonPress-1>', onObjectClick)
@@ -76,16 +76,11 @@ class MyFrame(Frame):
         print("I reached here")
         print(type(self._msg))
         print(self._msg)
-        self.myCanvas.coords(My_circle, click_container[self._msg][0], click_container[self._msg][1], click_container[self._msg][2],click_container[self._msg][3])
+        for x in self._history_o:
+          self.myCanvas.create_oval(click_container[x][0], click_container[x][1], click_container[x][2],click_container[x][3], width = 10) 
+        # self.myCanvas.coords(My_circle, click_container[self._msg][0], click_container[self._msg][1], click_container[self._msg][2],click_container[self._msg][3])
         self.myCanvas.update()
-      
-      self.myCanvas.coords(My_iris_1, 137, 137, 142, 142)
-      self.myCanvas.coords(My_iris_2, 197, 137, 202, 142)
-      sleep(1)
-      self.myCanvas.update()
-      self.myCanvas.coords(My_iris_1, 135, 135, 145, 145)
-      self.myCanvas.coords(My_iris_2, 195, 135, 205, 145)
-      sleep(1)
+        self._msg = -1
       self.myCanvas.update()
 
 frame02 = MyFrame()
