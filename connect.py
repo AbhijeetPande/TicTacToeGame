@@ -8,8 +8,43 @@ def get_shape(currentShape):
     currentShape = "x"
   return currentShape 
 
+def validate_click(frame) :
+  for x in frame._history_x :
+    if x == frame.square_id :
+      return False
+  for o in frame._history_o :
+    if o == frame.square_id :
+      return False
+  return True
+
 def check_victory(frame) :
-  return False
+  #check to see if there are enough entries
+  if frame._turn == "x" and len(frame._history_x) <= 2 or frame._turn == "o" and len(frame._history_o) <= 2:
+    return False
+  #there are enough entries, time to see if they line up
+  vertical_1 = {0, 3, 6}
+  vertical_2 = {1, 4, 7}
+  vertical_3 = {2, 5, 8}
+
+  horizontal_1 = {0, 1, 2}
+  horizontal_2 = {3, 4, 5}
+  horizontal_3 = {6, 7, 8}
+
+  diag_1 = {0, 4, 8}
+  diag_2 = {6, 4, 2}
+
+  solutions = [vertical_1, vertical_2, vertical_3, horizontal_1, horizontal_2, horizontal_3, diag_1, diag_2]
+  if frame._turn == "x":
+    for x in solutions:
+      if frame._history_x.issuperset(x) :
+        print("game over - x wins,")
+        return True
+  
+  if frame._turn == "o":
+    for o in solutions:
+      if frame._history_o.issuperset(o) :
+        print("game over- o wins,")
+        return True  
 
 def print_menu(frame) :
   return False
@@ -54,6 +89,7 @@ def bind_event(frame, click_function) :
 
 # Function to print either 'x' or 'o' inside the square that was clicked.
 def print_object(frame) :
+
   # Define the parameters for the circle or cross that needs to be drawn
   square_1 = [100, 100, 120, 120]
   square_2 = [140, 100, 160, 120]
@@ -69,7 +105,9 @@ def print_object(frame) :
 
   click_container = [square_1, square_2, square_3, square_4, square_5, square_6, square_7, square_8, square_9]
 
+  # Add square to list of squares that have been clicked
   if frame._turn == "x" :
+    frame._history_x.add(frame.square_id)
     frame.myCanvas.create_line(click_container[frame.square_id][0], 
                                click_container[frame.square_id][1], 
                                click_container[frame.square_id][2],
@@ -83,6 +121,7 @@ def print_object(frame) :
                               fill = "black",
                               width = 10 )
   elif frame._turn == "o" :
+    frame._history_o.add(frame.square_id)
     frame.myCanvas.create_oval(click_container[frame.square_id][0],
                                click_container[frame.square_id][1], 
                                click_container[frame.square_id][2],
@@ -92,8 +131,8 @@ def print_object(frame) :
 class MyFrame(Frame):
   def __init__(self):
     self.square_id = -1
-    self._history_o = []
-    self._history_x = []
+    self._history_o = set()
+    self._history_x = set()
     self._turn = "o"
     Frame.__init__(self)
 
@@ -104,13 +143,14 @@ class MyFrame(Frame):
       print('Got object click', event.x, event.y)
       print(event.widget.find_closest(event.x, event.y))
       self.square_id = int(''.join(map(str, event.widget.find_closest(event.x, event.y)))) - 2
-      self._history_o.append(self.square_id)
       print(self.square_id)
       print(type(self.square_id))
       self._turn = get_shape(self._turn)
-      print_object(self)
-      check_victory(self)
-
+      if validate_click(self):
+        print_object(self)
+        if check_victory(self):
+          print("finished game")
+          exit()
     bind_event(self, onObjectClick)
 
 
