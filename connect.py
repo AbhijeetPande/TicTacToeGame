@@ -47,7 +47,16 @@ def check_victory(frame) :
         return True  
 
 def print_menu(frame) :
-  return False
+  pass
+  #create a canvas, which is the start menu
+  frame.myCanvas = Canvas(width=300, height=300, bg="lightred")
+  
+  # create a title, and a "start as x" or "start as o"
+  #1) title
+  #2) option to start as 'o'
+  #3) option to start as 'x'
+  #set frame._turn to be x or o depending on user choice
+  #destroy canvas
 
 def print_game(frame) :
   # Create the canvas. A rectangle with four borders.
